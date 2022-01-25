@@ -69,6 +69,7 @@ class MainActivity : AppCompatActivity() {
                 }
             })
 
+
             overlays.add(0,MapEventsOverlay(object :MapEventsReceiver{
                 override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean {
                     return true
