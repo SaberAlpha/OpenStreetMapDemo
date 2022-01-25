@@ -6,10 +6,15 @@ import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import com.me.openstreetmapdemo.databinding.ActivityMainBinding
 import org.osmdroid.config.Configuration
+import org.osmdroid.events.MapEventsReceiver
+import org.osmdroid.events.MapListener
+import org.osmdroid.events.ScrollEvent
+import org.osmdroid.events.ZoomEvent
 import org.osmdroid.tileprovider.tilesource.TileSourceFactory
 import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapController
 import org.osmdroid.views.MapView
+import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 
 class MainActivity : AppCompatActivity() {
@@ -27,7 +32,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         Configuration.getInstance().load(this, PreferenceManager.getDefaultSharedPreferences(this))
         mapView = MapView(this)
-        binding.flContainer.addView(mapView,ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+        binding.flContainer.addView(mapView, ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 ViewGroup.LayoutParams.MATCH_PARENT))
         mapView?.apply {
             //设置地图源
@@ -45,8 +50,34 @@ class MainActivity : AppCompatActivity() {
 
         mMapController?.apply {
             setZoom(16)
-            animateTo(GeoPoint(39.901873,116.32665))
+            animateTo(GeoPoint(39.901873, 116.32665))
         }
 
+        initListener()
+
+    }
+
+    private fun initListener() {
+        mapView?.apply {
+            addMapListener(object :MapListener{
+                override fun onScroll(event: ScrollEvent?): Boolean {
+                    return false
+                }
+
+                override fun onZoom(event: ZoomEvent?): Boolean {
+                    return false
+                }
+            })
+
+            overlays.add(0,MapEventsOverlay(object :MapEventsReceiver{
+                override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean {
+                    return true
+                }
+
+                override fun longPressHelper(p: GeoPoint?): Boolean {
+                    return true
+                }
+            }))
+        }
     }
 }
