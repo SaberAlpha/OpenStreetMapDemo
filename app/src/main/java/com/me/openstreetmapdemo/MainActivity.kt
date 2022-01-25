@@ -1,9 +1,12 @@
 package com.me.openstreetmapdemo
 
+import android.graphics.drawable.BitmapDrawable
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.res.ResourcesCompat
 import com.me.openstreetmapdemo.databinding.ActivityMainBinding
 import org.osmdroid.config.Configuration
 import org.osmdroid.events.MapEventsReceiver
@@ -15,6 +18,7 @@ import org.osmdroid.util.GeoPoint
 import org.osmdroid.views.MapController
 import org.osmdroid.views.MapView
 import org.osmdroid.views.overlay.MapEventsOverlay
+import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.gestures.RotationGestureOverlay
 
 class MainActivity : AppCompatActivity() {
@@ -71,7 +75,8 @@ class MainActivity : AppCompatActivity() {
 
 
             overlays.add(0,MapEventsOverlay(object :MapEventsReceiver{
-                override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean {
+                override fun singleTapConfirmedHelper(p: GeoPoint): Boolean {
+                    addMarker(p)
                     return true
                 }
 
@@ -80,5 +85,18 @@ class MainActivity : AppCompatActivity() {
                 }
             }))
         }
+    }
+
+    private fun addMarker(p: GeoPoint) {
+        val marker = Marker(mapView)
+        marker.position = p
+        marker.setAnchor(Marker.ANCHOR_CENTER, Marker.ANCHOR_BOTTOM)
+        marker.isDraggable = true
+        marker.icon = ResourcesCompat.getDrawable(resources, R.drawable.loation_end, null)
+        marker.setOnMarkerClickListener { markers, _ ->
+            Toast.makeText(this, markers.position.toString(), Toast.LENGTH_SHORT).show()
+            true
+        }
+        mapView?.overlays?.add(marker)
     }
 }
